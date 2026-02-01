@@ -9,7 +9,7 @@ st.set_page_config(
 )
 
 import folium
-# components removed - using st.html() instead for stable rendering
+from streamlit_folium import st_folium
 import pandas as pd
 import io
 import json
@@ -1566,20 +1566,8 @@ folium.LayerControl(collapsed=False, position='topright').add_to(m)
 # MAIN CONTENT
 # ============================================
 
-# Map (full width) - cache the HTML to avoid regeneration
-# Use a simple fixed cache key - regenerate only when user uploads new data
-if 'map_html_cache' not in st.session_state or st.session_state.get('data_changed', False):
-    st.session_state['map_html_cache'] = m._repr_html_()
-    st.session_state['data_changed'] = False
-
-# Display the cached map HTML using st.html (doesn't re-render on rerun)
-# Wrap in a container div with fixed height
-map_container = f'''
-<div style="width:100%; height:700px; overflow:hidden;">
-{st.session_state['map_html_cache']}
-</div>
-'''
-st.html(map_container)
+# Display the map - simple and reliable
+st_folium(m, use_container_width=True, height=700, returned_objects=[])
 
 # Data section
 st.markdown("---")
