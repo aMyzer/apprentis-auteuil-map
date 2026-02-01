@@ -1,3 +1,4 @@
 *.geojson filter=lfs diff=lfs merge=lfs -text
 isochrone_cache.json filter=lfs diff=lfs merge=lfs -text
 *.csv filter=lfs diff=lfs merge=lfs -text
+map.html filter=lfs diff=lfs merge=lfs -text
