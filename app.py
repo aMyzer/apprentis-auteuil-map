@@ -1564,18 +1564,22 @@ folium.LayerControl(collapsed=False, position='topright').add_to(m)
 # MAIN CONTENT
 # ============================================
 
-# Map (full width) - cache the HTML and serve it directly for instant loading
-# The LayerControl is pure JavaScript, so interactions don't need Python
-map_html = m._repr_html_()
+# Map (full width) - cache the HTML to avoid regeneration
+# Generate HTML once and cache in session_state
+import hashlib
+df_hash = hashlib.md5(df.to_csv(index=False).encode()).hexdigest()[:8]
+cache_key = f"map_html_{df_hash}"
 
-# Display the cached map HTML - wrapped in fragment to prevent re-renders
-@st.fragment
-def render_map():
-    st.markdown('<div class="map-container">', unsafe_allow_html=True)
-    components.html(map_html, height=700, scrolling=False)
-    st.markdown('</div>', unsafe_allow_html=True)
+if cache_key not in st.session_state:
+    # Generate map HTML only once per data version
+    st.session_state[cache_key] = m._repr_html_()
 
-render_map()
+map_html = st.session_state[cache_key]
+
+# Display the map HTML - pure JavaScript interactions
+st.markdown('<div class="map-container">', unsafe_allow_html=True)
+components.html(map_html, height=700, scrolling=False)
+st.markdown('</div>', unsafe_allow_html=True)
 
 # Data section
 st.markdown("---")
