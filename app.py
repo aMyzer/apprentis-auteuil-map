@@ -1,6 +1,6 @@
 import streamlit as st
 import folium
-from streamlit_folium import st_folium
+import streamlit.components.v1 as components
 import pandas as pd
 import io
 import json
@@ -1561,10 +1561,11 @@ folium.LayerControl(collapsed=False, position='topright').add_to(m)
 # MAIN CONTENT
 # ============================================
 
-# Map (full width)
+# Map (full width) - using HTML export for better performance
 st.markdown('<div class="map-container">', unsafe_allow_html=True)
 with st.spinner('Chargement de la carte...'):
-    st_folium(m, width=None, height=700, returned_objects=[], key="main_map")
+    map_html = m._repr_html_()
+    components.html(map_html, height=700, scrolling=False)
 st.markdown('</div>', unsafe_allow_html=True)
 
 # Data section
