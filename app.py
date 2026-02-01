@@ -962,6 +962,9 @@ with st.sidebar:
                 if st.button("Remplacer", type="primary", use_container_width=True):
                     uploaded_df = uploaded_df.dropna(subset=['lat', 'lng'])
                     st.session_state.df = uploaded_df
+                    # Invalidate map cache to force rebuild with new data
+                    if "cached_map_html" in st.session_state:
+                        del st.session_state.cached_map_html
                     st.rerun()
         except Exception as e:
             st.error(f"❌ {e}")
@@ -970,6 +973,9 @@ with st.sidebar:
     if st.button("🔄 Réinitialiser", use_container_width=True):
         st.cache_data.clear()
         st.session_state.df = load_default_data()
+        # Invalidate map cache to force rebuild
+        if "cached_map_html" in st.session_state:
+            del st.session_state.cached_map_html
         st.rerun()
     
     st.markdown("---")
@@ -1045,6 +1051,9 @@ with st.sidebar:
             os.remove(ISOCHRONE_CACHE_FILE)
         st.session_state.isochrone_cache = {}
         st.session_state.api_logs = []
+        # Invalidate map cache to force rebuild without isochrones
+        if "cached_map_html" in st.session_state:
+            del st.session_state.cached_map_html
         st.success("Cache vidé!")
         st.rerun()
     
@@ -1564,18 +1573,16 @@ folium.LayerControl(collapsed=False, position='topright').add_to(m)
 # MAIN CONTENT
 # ============================================
 
-# Map rendering with @st.fragment to prevent constant reloading
-@st.fragment
-def render_map(folium_map):
-    """Render map in isolated fragment to prevent full page reruns"""
-    st.markdown('<div class="map-container">', unsafe_allow_html=True)
-    map_html = folium_map._repr_html_()
-    components.html(map_html, height=700, scrolling=False)
-    st.markdown('</div>', unsafe_allow_html=True)
+# Cache the map HTML to prevent constant reloading
+# Only rebuild when data changes (upload, reset, clear cache)
+if "cached_map_html" not in st.session_state:
+    with st.spinner('Construction de la carte...'):
+        st.session_state.cached_map_html = m._repr_html_()
 
-# Display map (isolated from page reruns)
-with st.spinner('Chargement de la carte...'):
-    render_map(m)
+# Display cached map - never triggers reload on normal interactions
+st.markdown('<div class="map-container">', unsafe_allow_html=True)
+components.html(st.session_state.cached_map_html, height=700, scrolling=False)
+st.markdown('</div>', unsafe_allow_html=True)
 
 # Data section
 st.markdown("---")
