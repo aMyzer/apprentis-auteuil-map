@@ -9,7 +9,7 @@ st.set_page_config(
 )
 
 import folium
-import streamlit.components.v1 as components
+# components removed - using st.html() instead for stable rendering
 import pandas as pd
 import io
 import json
@@ -962,6 +962,7 @@ with st.sidebar:
                 if st.button("Remplacer", type="primary", use_container_width=True):
                     uploaded_df = uploaded_df.dropna(subset=['lat', 'lng'])
                     st.session_state.df = uploaded_df
+                    st.session_state['data_changed'] = True
                     st.rerun()
         except Exception as e:
             st.error(f"❌ {e}")
@@ -970,6 +971,7 @@ with st.sidebar:
     if st.button("🔄 Réinitialiser", use_container_width=True):
         st.cache_data.clear()
         st.session_state.df = load_default_data()
+        st.session_state['data_changed'] = True
         st.rerun()
     
     st.markdown("---")
@@ -1565,21 +1567,19 @@ folium.LayerControl(collapsed=False, position='topright').add_to(m)
 # ============================================
 
 # Map (full width) - cache the HTML to avoid regeneration
-# Generate HTML once and cache in session_state
-import hashlib
-df_hash = hashlib.md5(df.to_csv(index=False).encode()).hexdigest()[:8]
-cache_key = f"map_html_{df_hash}"
+# Use a simple fixed cache key - regenerate only when user uploads new data
+if 'map_html_cache' not in st.session_state or st.session_state.get('data_changed', False):
+    st.session_state['map_html_cache'] = m._repr_html_()
+    st.session_state['data_changed'] = False
 
-if cache_key not in st.session_state:
-    # Generate map HTML only once per data version
-    st.session_state[cache_key] = m._repr_html_()
-
-map_html = st.session_state[cache_key]
-
-# Display the map HTML - pure JavaScript interactions
-st.markdown('<div class="map-container">', unsafe_allow_html=True)
-components.html(map_html, height=700, scrolling=False)
-st.markdown('</div>', unsafe_allow_html=True)
+# Display the cached map HTML using st.html (doesn't re-render on rerun)
+# Wrap in a container div with fixed height
+map_container = f'''
+<div style="width:100%; height:700px; overflow:hidden;">
+{st.session_state['map_html_cache']}
+</div>
+'''
+st.html(map_container)
 
 # Data section
 st.markdown("---")
@@ -1608,6 +1608,7 @@ with st.expander("📋 Gérer les données", expanded=False):
         with c2:
             if st.button("💾 Appliquer", type="primary", use_container_width=True):
                 st.session_state.df = edited_df
+                st.session_state['data_changed'] = True
                 st.rerun()
         with c3:
             if st.button("❌ Annuler", use_container_width=True):
