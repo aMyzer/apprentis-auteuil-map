@@ -1,4 +1,13 @@
 import streamlit as st
+
+# Page configuration - MUST be first Streamlit command
+st.set_page_config(
+    page_title="Outil de dataviz - Apprentis d'Auteuil",
+    page_icon="🏠",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
 import folium
 from streamlit_folium import st_folium
 import pandas as pd
@@ -385,13 +394,7 @@ def get_epci_qpv_counts(_version=CACHE_VERSION):
     
     return epci_data
 
-# Page configuration
-st.set_page_config(
-    page_title="Outil de dataviz - Apprentis d'Auteuil",
-    page_icon="🏠",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+# Page configuration is set at the top of the file
 
 # ============================================
 # CUSTOM CSS - APPRENTIS D'AUTEUIL BRANDING
