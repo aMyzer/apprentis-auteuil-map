@@ -1564,11 +1564,15 @@ folium.LayerControl(collapsed=False, position='topright').add_to(m)
 # MAIN CONTENT
 # ============================================
 
-# Map (full width)
-st.markdown('<div class="map-container">', unsafe_allow_html=True)
+# Map (full width) - use fragment to prevent full page reruns on map interaction
+@st.fragment
+def render_map():
+    st.markdown('<div class="map-container">', unsafe_allow_html=True)
+    st_folium(m, use_container_width=True, height=700, returned_objects=[], key="main_map")
+    st.markdown('</div>', unsafe_allow_html=True)
+
 with st.spinner('Chargement de la carte...'):
-    st_folium(m, width=None, height=700, returned_objects=[], key="main_map")
-st.markdown('</div>', unsafe_allow_html=True)
+    render_map()
 
 # Data section
 st.markdown("---")
