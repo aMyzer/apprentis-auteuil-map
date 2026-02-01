@@ -1,13 +1,4 @@
 import streamlit as st
-
-# Page configuration - MUST be first Streamlit command
-st.set_page_config(
-    page_title="Outil de dataviz - Apprentis d'Auteuil",
-    page_icon="🏠",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
 import folium
 import streamlit.components.v1 as components
 import pandas as pd
@@ -394,7 +385,13 @@ def get_epci_qpv_counts(_version=CACHE_VERSION):
     
     return epci_data
 
-# Page configuration is set at the top of the file
+# Page configuration
+st.set_page_config(
+    page_title="Outil de dataviz - Apprentis d'Auteuil",
+    page_icon="🏠",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
 # ============================================
 # CUSTOM CSS - APPRENTIS D'AUTEUIL BRANDING
@@ -959,7 +956,7 @@ with st.sidebar:
                 st.error("❌ lat/lng invalides")
             else:
                 st.success(f"✅ {len(uploaded_df)} lignes")
-                if st.button("Remplacer", type="primary"):
+                if st.button("Remplacer", type="primary", use_container_width=True):
                     uploaded_df = uploaded_df.dropna(subset=['lat', 'lng'])
                     st.session_state.df = uploaded_df
                     st.rerun()
@@ -967,7 +964,7 @@ with st.sidebar:
             st.error(f"❌ {e}")
     
     # Reset to default button
-    if st.button("🔄 Réinitialiser"):
+    if st.button("🔄 Réinitialiser", use_container_width=True):
         st.cache_data.clear()
         st.session_state.df = load_default_data()
         st.rerun()
@@ -1582,6 +1579,7 @@ with st.expander("📋 Gérer les données", expanded=False):
     edited_df = st.data_editor(
         df,
         num_rows="dynamic",
+        use_container_width=True,
         column_config={
             "title": st.column_config.TextColumn("Établissement", required=True),
             "categorie": st.column_config.TextColumn("Catégorie", width="medium"),
@@ -1597,11 +1595,11 @@ with st.expander("📋 Gérer les données", expanded=False):
     if not edited_df.equals(df):
         c1, c2, c3 = st.columns([3, 1, 1])
         with c2:
-            if st.button("💾 Appliquer", type="primary"):
+            if st.button("💾 Appliquer", type="primary", use_container_width=True):
                 st.session_state.df = edited_df
                 st.rerun()
         with c3:
-            if st.button("❌ Annuler"):
+            if st.button("❌ Annuler", use_container_width=True):
                 st.rerun()
     
     # Download button for current data
@@ -1612,7 +1610,8 @@ with st.expander("📋 Gérer les données", expanded=False):
         label="📥 Télécharger les données (CSV)",
         data=csv_buffer.getvalue(),
         file_name="etablissements_export.csv",
-        mime="text/csv"
+        mime="text/csv",
+        use_container_width=True
     )
 
 with st.expander("❓ Aide", expanded=False):
