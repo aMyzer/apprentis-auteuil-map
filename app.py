@@ -1564,12 +1564,18 @@ folium.LayerControl(collapsed=False, position='topright').add_to(m)
 # MAIN CONTENT
 # ============================================
 
-# Map (full width) - using HTML export for better performance
-st.markdown('<div class="map-container">', unsafe_allow_html=True)
-with st.spinner('Chargement de la carte...'):
-    map_html = m._repr_html_()
+# Map rendering with @st.fragment to prevent constant reloading
+@st.fragment
+def render_map(folium_map):
+    """Render map in isolated fragment to prevent full page reruns"""
+    st.markdown('<div class="map-container">', unsafe_allow_html=True)
+    map_html = folium_map._repr_html_()
     components.html(map_html, height=700, scrolling=False)
-st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# Display map (isolated from page reruns)
+with st.spinner('Chargement de la carte...'):
+    render_map(m)
 
 # Data section
 st.markdown("---")
