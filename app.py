@@ -1568,10 +1568,14 @@ folium.LayerControl(collapsed=False, position='topright').add_to(m)
 # The LayerControl is pure JavaScript, so interactions don't need Python
 map_html = m._repr_html_()
 
-# Display the cached map HTML - no Python processing needed for interactions
-st.markdown('<div class="map-container">', unsafe_allow_html=True)
-components.html(map_html, height=700, scrolling=False)
-st.markdown('</div>', unsafe_allow_html=True)
+# Display the cached map HTML - wrapped in fragment to prevent re-renders
+@st.fragment
+def render_map():
+    st.markdown('<div class="map-container">', unsafe_allow_html=True)
+    components.html(map_html, height=700, scrolling=False)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+render_map()
 
 # Data section
 st.markdown("---")
