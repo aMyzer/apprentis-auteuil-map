@@ -1,3 +1,15 @@
+---
+title: Apprentis d'Auteuil Map
+emoji: 🏠
+colorFrom: red
+colorTo: pink
+sdk: streamlit
+sdk_version: "1.30.0"
+python_version: "3.11"
+app_file: app.py
+pinned: false
+---
+
 # Outil de Dataviz - Apprentis d'Auteuil
 
 Application Streamlit de visualisation géographique des établissements des Apprentis d'Auteuil en France métropolitaine.
