@@ -1,10 +1,10 @@
 ---
-title: Apprentis d'Auteuil Map
-emoji: 🏠
-colorFrom: red
-colorTo: pink
+title: Apprentis Auteuil Map
+emoji: 🗺️
+colorFrom: blue
+colorTo: green
 sdk: streamlit
-sdk_version: "1.32.0"
+sdk_version: 1.37.0
 python_version: "3.11"
 app_file: app.py
 pinned: false
