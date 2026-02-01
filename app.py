@@ -9,7 +9,7 @@ st.set_page_config(
 )
 
 import folium
-from streamlit_folium import st_folium
+import streamlit.components.v1 as components
 import pandas as pd
 import io
 import json
@@ -1564,15 +1564,14 @@ folium.LayerControl(collapsed=False, position='topright').add_to(m)
 # MAIN CONTENT
 # ============================================
 
-# Map (full width) - use fragment to prevent full page reruns on map interaction
-@st.fragment
-def render_map():
-    st.markdown('<div class="map-container">', unsafe_allow_html=True)
-    st_folium(m, use_container_width=True, height=700, returned_objects=[], key="main_map")
-    st.markdown('</div>', unsafe_allow_html=True)
+# Map (full width) - cache the HTML and serve it directly for instant loading
+# The LayerControl is pure JavaScript, so interactions don't need Python
+map_html = m._repr_html_()
 
-with st.spinner('Chargement de la carte...'):
-    render_map()
+# Display the cached map HTML - no Python processing needed for interactions
+st.markdown('<div class="map-container">', unsafe_allow_html=True)
+components.html(map_html, height=700, scrolling=False)
+st.markdown('</div>', unsafe_allow_html=True)
 
 # Data section
 st.markdown("---")
