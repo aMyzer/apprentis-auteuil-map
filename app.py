@@ -1577,12 +1577,16 @@ folium.LayerControl(collapsed=False, position='topright').add_to(m)
 # Only rebuild when data changes (upload, reset, clear cache)
 if "cached_map_html" not in st.session_state:
     with st.spinner('Construction de la carte...'):
-        st.session_state.cached_map_html = m._repr_html_()
+        # Wrap map HTML in a container with fixed height
+        raw_html = m._repr_html_()
+        st.session_state.cached_map_html = f'''
+        <div style="width:100%;height:700px;overflow:hidden;">
+            {raw_html}
+        </div>
+        '''
 
-# Display cached map - never triggers reload on normal interactions
-st.markdown('<div class="map-container">', unsafe_allow_html=True)
-components.html(st.session_state.cached_map_html, height=700, scrolling=False)
-st.markdown('</div>', unsafe_allow_html=True)
+# Display cached map using st.html() - more stable than components.html()
+st.html(st.session_state.cached_map_html)
 
 # Data section
 st.markdown("---")
